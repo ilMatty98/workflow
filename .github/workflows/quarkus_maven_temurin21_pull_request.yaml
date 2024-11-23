@@ -2,6 +2,8 @@ name: Quarkus CI/CD Pipeline - Temurin (Java 21, Maven) # Name of the workflow
 
 on:
   workflow_call:  # Trigger that allows other workflows to call this workflow
+    permissions:
+      contents: write  # Write permission specified for reusable workflow
 
 #on:
 #  pull_request: # Trigger the workflow on pull requests
