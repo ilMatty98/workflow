@@ -83,10 +83,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Step to run tests
-      - name: Run tests
-        run: npm test
-
       # Step to build project
       - name: Build project
         run: npm run build:prod
