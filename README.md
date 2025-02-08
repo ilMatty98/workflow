@@ -5,7 +5,7 @@ automate the CI/CD pipeline for your project.
 
 ---
 
-## Quarkus Maven GraalVM17 / Temurin21 for deployment on Google Kubernetes Engine (GKE)
+## Quarkus/Spring Maven GraalVM17 / Temurin21 for deployment on Google Kubernetes Engine (GKE)
 
 ### Step
 
@@ -91,7 +91,7 @@ jobs:
 
 ---
 
-## Quarkus Maven Temurin21
+## Quarkus/Spring Maven Temurin21
 
 ### Step
 
