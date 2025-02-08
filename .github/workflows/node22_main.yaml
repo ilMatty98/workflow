@@ -84,7 +84,7 @@ jobs:
         run: npm install
 
       # Step to build project
-      - name:
+      - name: Build project
         run: CI=false npm run build:prod
 
       # Step to perform code quality analysis with SonarQube
