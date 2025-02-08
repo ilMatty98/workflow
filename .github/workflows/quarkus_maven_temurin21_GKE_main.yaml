@@ -53,7 +53,7 @@ jobs:
           # Export the new version as an environment variable for further use
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
         env:
-          NEW_VERSION: ${{ env.new_version }}
+          NEW_VERSION: ${{ env.NEW_VERSION }}
 
       # Step to Commit, Tag and Push the new version of pom.xml
       - name: Commit, Tag and Push the new version of pom.xml
