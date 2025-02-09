@@ -52,7 +52,7 @@ jobs:
               ;;
           esac
 
-      # Step to upgrade the version in package.json if pull request is opened
+      # Step to upgrade the version in package.json and package-lock.json if pull request is opened
       - name: Upgrade version in package.json if pull request is opened
         if: github.event.action == 'opened'
         run: |
@@ -71,8 +71,9 @@ jobs:
             NEW_VERSION=$major.$minor.$((patch + 1))
           fi
 
-          # Update version in pom.xml
+          # Update version in package.xml and package-lock.xml
           jq --arg new_version "$NEW_VERSION" '.version=$new_version' package.json > tmp.json && mv tmp.json package.json
+          jq --arg new_version "$NEW_VERSION" '.version=$new_version' package-lock.json > tmp.json && mv tmp.json package-lock.json
 
           # Export the new version as an environment variable
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
@@ -83,7 +84,7 @@ jobs:
       - name: Add or increment -SNAPSHOT suffix if pull request is opened or synchronize
         if: github.event.action == 'opened' || github.event.action == 'synchronize'
         run: |
-          # Extract current version from pom.xml
+          # Extract current version from package.json
           CURRENT_VERSION=$(node -p "require('./package.json').version")
 
           # Check if the current version already has a -SNAPSHOT suffix with a number
@@ -98,8 +99,9 @@ jobs:
           # Append or increment -SNAPSHOT version
           NEW_VERSION="${BASE_VERSION}-SNAPSHOT${SNAPSHOT_NUM}"
 
-          # Update version in pom.xml
+          # Update version in package.xml and package-lock.xml
           jq --arg new_version "$NEW_VERSION" '.version=$new_version' package.json > tmp.json && mv tmp.json package.json
+          jq --arg new_version "$NEW_VERSION" '.version=$new_version' package-lock.json > tmp.json && mv tmp.json package-lock.json
 
           # Export the new version as an environment variable
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
@@ -111,23 +113,17 @@ jobs:
         run: |
           git config --global user.email "${{ secrets.GIT_HUB_EMAIL }}"
           git config --global user.name "${{ secrets.GIT_HUB_NAME }}"
-          git add package.json
+          
+          # Commit changes to package.json and package-lock.json
+          git add package.json package-lock.json
           git commit -m "Upgrade version to ${{ env.NEW_VERSION }}"
+          
           git push -f origin HEAD:refs/heads/${{ github.head_ref }}
         env:
           GITHUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}  # Token for authentication
           NEW_VERSION: ${{ env.NEW_VERSION }}  # The new version calculated earlier
 
-      # Step to Cache Maven dependencies
-      - name: Cache Maven dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository  # Path to the cache location (where Maven stores dependencies)
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}  # Unique cache key based on OS and pom.xml content
-          restore-keys: |
-            ${{ runner.os }}-maven-  # Fallback key based on OS only
-
-            # Step to Install dependencies
+      # Step to Install dependencies
       - name: Install dependencies
         run: npm install
 
