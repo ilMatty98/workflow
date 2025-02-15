@@ -182,7 +182,7 @@ jobs:
         run: |
           git config --global user.email "${{ secrets.GIT_HUB_EMAIL }}"
           git config --global user.name "${{ secrets.GIT_HUB_NAME }}"
-          git add pom.xml 8s/deployment.yaml
+          git add pom.xml k8s/deployment.yaml
           git commit -m "Upgrade version to ${{ env.NEW_VERSION }}"
           git push -f origin HEAD:refs/heads/${{ github.head_ref }}
         env:
