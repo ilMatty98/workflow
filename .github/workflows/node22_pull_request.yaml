@@ -177,7 +177,7 @@ jobs:
           git config --global user.email "${{ secrets.GIT_HUB_EMAIL }}"
           git config --global user.name "${{ secrets.GIT_HUB_NAME }}"
           
-          # Commit changes to package.json and package-lock.json
+          # Commit changes to package.json, package-lock.json and k8s/deployment.yaml
           git add package.json package-lock.json k8s/deployment.yaml
           git commit -m "Upgrade version to ${{ env.NEW_VERSION }}"
           

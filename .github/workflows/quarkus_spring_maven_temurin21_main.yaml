@@ -124,6 +124,11 @@ jobs:
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
+       # Step to Update k8s deployment.yaml with new image
+      - name: Update k8s deployment.yaml with new image
+        run: |
+          sed -i "s|image: .*|image: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY_NAME }}:${{ env.VERSION }}|" k8s/deployment.yaml
+
       # Step to build Docker image
       - name: Build Docker image
         run: |
@@ -144,3 +149,28 @@ jobs:
           DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
           DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
           DOCKER_HUB_REPOSITORY_NAME: ${{ secrets.DOCKER_HUB_REPOSITORY_NAME }}
+
+      # Step to Commit, Tag and Push the new version of pom.xml and k8s/deployment.yaml
+      - name: Commit, Tag and Push the new version of pom.xml and k8s/deployment.yaml
+        run: |
+          git config --global user.email "${{ secrets.GIT_HUB_EMAIL }}"
+          git config --global user.name "${{ secrets.GIT_HUB_NAME }}"
+
+          # Check if there are changes to commit
+          git diff --exit-code || (
+            # Commit changes to pom.xml and k8s/deployment.yaml
+            git add pom.xml k8s/deployment.yaml
+            git commit -m "Upgrade version to ${{ env.NEW_VERSION }}"
+
+            # Push commit and tag to the repository
+            git push origin HEAD:refs/heads/main
+          )
+
+          # Create a new tag
+          git tag -a "v${{ env.NEW_VERSION }}" -m "Release version ${{ env.NEW_VERSION }}"
+
+          # Push commit and tag to the repository
+          git push origin HEAD:refs/heads/main --tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}  # Token for authentication
+          NEW_VERSION: ${{ env.NEW_VERSION }}  # The new version calculated earlier

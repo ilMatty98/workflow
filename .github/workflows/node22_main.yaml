@@ -151,7 +151,7 @@ jobs:
           
           # Check if there are changes to commit
           git diff --exit-code || (
-            # Commit changes to package.json and package-lock.json
+            # Commit changes to package.json, package-lock.json and k8s/deployment.yaml
             git add package.json package-lock.json k8s/deployment.yaml
             git commit -m "Upgrade version to ${{ env.NEW_VERSION }}"
           
